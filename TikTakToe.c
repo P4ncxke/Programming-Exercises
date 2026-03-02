@@ -139,12 +139,16 @@ void PlayerMove()
     {
         // Put in our spot
         printf("Your turn, i.e. A3: ");
-    
+
         scanf("%c%c", &x, &y);
-        while ((c = getchar()) != '\n' && c != EOF); // empty input buffer
+        while ((c = getchar()) != '\n' && c != EOF)
+            ; // empty input buffer
 
         // Make sure that the letter is in upper
-        if (x >= 97 && x <= 122) { x -= 32; }
+        if (x >= 97 && x <= 122)
+        {
+            x -= 32;
+        }
 
         // Make sure that given coordinates are within the board
         if ((x >= 65 && x <= 65 + (bsize - 1)) && (y >= 49 && y <= 49 + (bsize - 1))) // 65 = A (start of X axis), 49 = 1 (start of Y axis)
@@ -157,7 +161,8 @@ void PlayerMove()
             {
                 break;
             }
-            else {
+            else
+            {
                 printf("This spot is taken, try again!\n");
             }
         }
@@ -169,11 +174,6 @@ void PlayerMove()
 
     // All is good, fill spot with an O
     b[x][y] = 1;
-}
-
-int CheckOdd(int n)
-{
-    return n % 2; // any rest from divide will return true (non-zero)
 }
 
 int CheckWin()
@@ -290,7 +290,7 @@ int CheckWin()
         }
     }
 
-            if (win) // Assuming there is a X then then there is win.
+    if (win) // Assuming there is a X then then there is win.
     {
         return 1;
     }
@@ -298,7 +298,7 @@ int CheckWin()
     // ANTI-MAIN DIAGONAL
 
     // Checks for O's
-        for (x = 0; x < bsize; ++x)
+    for (x = 0; x < bsize; ++x)
     {
         win = 1; // I Assume this row is a winning one
         if (b[x][bsize - x - 1] != 1)
@@ -327,25 +327,36 @@ int CheckWin()
     if (win) // Assuming there is a X then then there is win.
     {
         return 1;
-    }        
+    }
 
     // There was no win
     return 0;
 }
 
-int Points()
+char MakeUpper(char c)
 {
-    int x, y;
-
-    if (b[x][y] == 1)
+    if (c >= 97 && c <= 122)
     {
-        printf("You have won.\n");
+        return c -= 32;
     }
-    if (b[x][y] == 2)
+    else
     {
-        printf("I have won.\n");
+        return c;
     }
 }
+
+int IsChoiceCorrect(char c)
+{
+    if (c == 'Y' || c == 'N')
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 //
 // MAIN PROGRAM
 //
@@ -355,85 +366,123 @@ int main()
     unsigned int player_starts; // Keeps info who starts the game.
     unsigned int player_moves;  // 0 --> computer, 1 --> player
     int x, y;
+    int Points = 0;
+
+    char choice;
+    int BoardChoice;
 
     // Welcome message.
     printf("\n\nWelcome to Tic Tac Toe game!\n\n");
-    printf("Let's see who starts... ");
-    // !!! delay
-    // Start the lottery.
-    srand(time(NULL)); // Initialize random seed.
-    // whostarts = 0 --> computer starts
-    // whostarts = 1 --> player starts
-    player_starts = rand() % 2;
-    if (player_starts)
+    do
     {
-        printf("YOU START! and you have Os\n");
-        player_moves = 1;
-    }
-    else
-    {
-        printf("I WILL START! and I have Xs\n");
-        player_moves = 0;
-    }
-
-    // !!! Ask for bsize
-    bsize = 4;
-
-    // Zero the board.
-    ZeroBoard();
-
-    // Test, set some Xs and Os:
-    // 0 = empty, 1 = O, 2 = X.
-    // b[0][0] = 2;
-    // b[0][1] = 2;
-    // b[0][2] = 0;
-    // b[0][3] = 0;
-    // ShowBoard();
-    // printf("checkboard: %d\n", CheckWin());
-    // return 0;
-
-    ShowBoard();
-
-    // Show the board.
-    while (1)
-    {
-
-        if (player_moves)
+        printf("Let's see who starts... ");
+        // Start the lottery.
+        srand(time(NULL)); // Initialize random seed.
+        // whostarts = 0 --> computer starts
+        // whostarts = 1 --> player starts
+        player_starts = rand() % 2;
+        if (player_starts)
         {
-            PlayerMove();
-            printf("\n");
-            player_moves = 0;
+            printf("YOU START! and you have Os\n");
+            player_moves = 1;
         }
         else
         {
-            ComputerMove();
-            player_moves = 1;
+            printf("I WILL START! and I have Xs\n");
+            player_moves = 0;
         }
 
-        ShowBoard();
+        INPUT:
+        printf("Please input you're board size!\n");
 
-        // Check end conditions (board full or someone wins).
-        if (CheckWin())
+        scanf("%d", &BoardChoice);
+        if (BoardChoice >= 3 && BoardChoice <= 8)
         {
-            if (!player_moves) { // player_moves is reversed in this very moment.
-                printf("You won!\n");
-            }
-            else {
-                printf("I won. Ha!\n");
-            }
-            
-            break;
+            bsize = BoardChoice;
         }
-        
-        // Check if the board if full.
-        if (!IsBoardFree())
+        else
         {
-            if (!CheckWin()) {
-                printf("It is a draw.");
-            }
-            break;
-        }  
-    }
+            goto INPUT;
+        }
 
-    // !!! Print points
+        ZeroBoard(); // Zero the board.
+        ShowBoard(); // Show the board.
+
+        while (1)
+        {
+
+            if (player_moves)
+            {
+                PlayerMove();
+                printf("\n");
+                player_moves = 0;
+            }
+            else
+            {
+                ComputerMove();
+                player_moves = 1;
+            }
+
+            ShowBoard();
+
+            // Check end conditions (board full or someone wins).
+            if (CheckWin())
+            {
+                if (!player_moves)
+                // player_moves is reversed in this very moment.
+                {
+                    printf("You won!\n");
+                }
+                else
+                {
+                    printf("I won. Ha!\n");
+                }
+
+                break;
+            }
+
+            // Check if the board if full.
+            if (!IsBoardFree())
+            {
+                if (!CheckWin())
+                {
+                    printf("It is a draw.");
+                }
+                break;
+            }
+        }
+
+        // Print points
+
+        // For Player
+        if (!player_moves)
+        {
+            Points = Points + 1;
+            printf("The score is %d | 0\n\n", Points);
+        }
+
+        // For Computer
+        if (player_moves)
+        {
+            Points = Points + 1;
+            printf("The score is 0 | %d\n\n", Points);
+        }
+
+        printf("Do you want a rematch?\n\n");
+
+        do
+        {
+            // Menu
+            printf("y or Y = yes\n");
+            printf("n or N = no\n");
+            choice = MakeUpper(getchar());
+            char v;
+            while ((v = getchar()) != '\n' && v != EOF)
+                if (!IsChoiceCorrect(choice))
+                {
+                    printf("Read The ... Manual.\n");
+                    printf("Their There For a Reason.\n\n");
+                }
+        } while (!IsChoiceCorrect(choice));
+    } while (choice == 'Y');
 }
