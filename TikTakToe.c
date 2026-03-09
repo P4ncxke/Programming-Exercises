@@ -393,9 +393,10 @@ int main()
         }
 
         INPUT:
-        printf("Please input you're board size!\n");
+        printf("Please input board size! (3-8)\n");
 
         scanf("%d", &BoardChoice);
+        while ((getchar()) != '\n');
         if (BoardChoice >= 3 && BoardChoice <= 8)
         {
             bsize = BoardChoice;
@@ -406,8 +407,11 @@ int main()
         }
 
         ZeroBoard(); // Zero the board.
-        ShowBoard(); // Show the board.
-
+        if (player_moves)
+        {
+            ShowBoard(); // Show the board.
+        }
+        
         while (1)
         {
 
